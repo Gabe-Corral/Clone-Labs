@@ -9,7 +9,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { Switch, Route } from 'react-router-dom';
-//import './App.css';
+import CreateGame from './components/CreateGame'
+import './App.css';
 
 function Copyright() {
   return (
@@ -63,7 +64,7 @@ export default function App() {
                 required
                 fullWidth
                 id="nickname"
-                label="Nick Name"
+                label="Nickname"
                 name="nick"
                 autoFocus
               />
@@ -100,8 +101,11 @@ export default function App() {
         </Container>
       </Route>
       <Route exact path="/creategame">
+        <CreateGame />
+      </Route>
+      <Route path="/:id">
         <h1>
-          test
+          Room
         </h1>
       </Route>
     </Switch>
