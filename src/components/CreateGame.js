@@ -43,6 +43,42 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function onCreateGame(e) {
+  e.preventDefault()
+  let nickname = e.target.nickname.value;
+  let room_name = e.target.room_name.value;
+  createPlayer(nickname)
+  createGame(room_name)
+}
+
+function createGame(game_name) {
+  fetch("http://localhost:8000/create_game/", {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      name: game_name
+    })
+  }).then(res => res.json())
+  .then(res => console.log(res))
+}
+
+function createPlayer(player_name) {
+  fetch("http://localhost:8000/post_player/", {
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      nickname: player_name
+    })
+  }).then(res => res.json())
+  .then(res => console.log(res))
+}
+
 export default function CreateGame() {
   const classes = useStyles();
 
@@ -53,7 +89,7 @@ export default function CreateGame() {
             <Typography component="h1" variant="h5">
               Create Game
             </Typography>
-            <form className={classes.form} noValidate>
+            <form className={classes.form} noValidate onSubmit={onCreateGame}>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -61,7 +97,7 @@ export default function CreateGame() {
                 fullWidth
                 id="nickname"
                 label="Your Nickname"
-                name="nick"
+                name="nickname"
                 autoFocus
               />
               <TextField
@@ -82,7 +118,6 @@ export default function CreateGame() {
                 fullWidth
                 variant="contained"
                 color="primary"
-                className={classes.submit}
               >
                 Create Game
               </Button>
