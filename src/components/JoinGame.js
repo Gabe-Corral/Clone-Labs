@@ -3,12 +3,11 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import { withRouter, useHistory } from 'react-router-dom';
 
 function Copyright() {
@@ -44,14 +43,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function CreateGame(props) {
+function JoinGame(props) {
   const classes = useStyles();
   const history = useHistory();
 
-  const handleCreateGame = (e) => {
+  const handleJoin = (e) => {
     e.preventDefault();
-    props.onCreateGame(e);
-    history.push(`/${e.target.room_name.value}`);
+    props.onJoin(e);
+    history.push(`/${e.target.server_id.value}`);
+
   }
 
   return (
@@ -59,30 +59,34 @@ function CreateGame(props) {
           <CssBaseline />
           <div className={classes.paper}>
             <Typography component="h1" variant="h5">
-              Create Game
+              Join Game
             </Typography>
-            <form className={classes.form} noValidate onSubmit={handleCreateGame}>
+            <form className={classes.form} noValidate onSubmit={handleJoin}>
               <TextField
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
-                name="room_name"
-                label="Room Name"
-                id="room_name"
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Private Game"
+                name="server_id"
+                label="Server Code"
+                id="server_id"
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 color="primary"
+                className={classes.submit}
               >
-                Create Game
+                Join
               </Button>
+              <Grid container>
+                <Grid item xs>
+                  <Link href="creategame" variant="body2">
+                    Create Game
+                  </Link>
+                </Grid>
+              </Grid>
             </form>
           </div>
           <Box mt={8}>
@@ -92,4 +96,4 @@ function CreateGame(props) {
   );
 }
 
-export default withRouter(CreateGame);
+export default withRouter(JoinGame);
