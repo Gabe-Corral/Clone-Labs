@@ -1,112 +1,78 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import React, {useState} from 'react';
 import { Switch, Route } from 'react-router-dom';
-import CreateGame from './components/CreateGame'
+import Login from './components/Login';
+import SignUp from './components/SignUp';
+import CreateGame from './components/CreateGame';
+import JoinGame from './components/JoinGame';
+import Game from './components/Game';
 import './App.css';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
 export default function App() {
-  const classes = useStyles();
+  const [player, setPlayer] = useState({});
+  const [game, setGame] = useState({});
+
+  const onJoin = (e) => {
+    e.preventDefault()
+    let room_code = e.target.server_id.value;
+    getGameByName(room_code);
+  }
+
+  const getGameByName = (name) => {
+    fetch(`http://localhost:8000/game_name/${name}/`)
+      .then(res => res.json())
+      .then(res => setGame(res))
+  }
+
+  const onCreateGame = (e) => {
+    e.preventDefault()
+    let room_name = e.target.room_name.value;
+    createGame(room_name);
+  }
+
+  const createGame = (game_name) => {
+    fetch("http://localhost:8000/create_game/", {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        name: game_name
+      })
+    }).then(res => res.json())
+    .then(res => setGame(res))
+  }
+
+  const createPlayer = (player_name) => {
+    fetch("http://localhost:8000/post_player/", {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        nickname: player_name
+      })
+    }).then(res => res.json())
+    .then(res => setPlayer(res))
+  }
 
   return (
     <Switch>
       <Route exact path="/">
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
-          <div className={classes.paper}>
-            <Typography component="h1" variant="h5">
-              Join Game
-            </Typography>
-            <form className={classes.form} noValidate>
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="nickname"
-                label="Nickname"
-                name="nick"
-                autoFocus
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                name="server_id"
-                label="Server Code"
-                id="server_id"
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-              >
-                Join
-              </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="creategame" variant="body2">
-                    Create Game
-                  </Link>
-                </Grid>
-              </Grid>
-            </form>
-          </div>
-          <Box mt={8}>
-            <Copyright />
-          </Box>
-        </Container>
+        <Login />
+      </Route>
+      <Route exact path="/signup">
+        <SignUp createPlayer={createPlayer} />
+      </Route>
+      <Route exact path="/joingame">
+        <JoinGame onJoin={onJoin} />
       </Route>
       <Route exact path="/creategame">
-        <CreateGame />
+        <CreateGame onCreateGame={onCreateGame} />
       </Route>
-      <Route path="/:id">
-        <h1>
-          Room
-        </h1>
+      <Route path="/:name">
+        <Game player={player} game={game} />
       </Route>
     </Switch>
   );
