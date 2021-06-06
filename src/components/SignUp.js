@@ -53,9 +53,24 @@ function SignUp(props) {
     let nickname = e.target.nickname.value;
     let password = e.target.password.value;
     let confirm_password = e.target.password_con.value;
-    console.log(nickname, password, confirm_password)
-    props.createPlayer(nickname)
-    history.push('/joingame')
+
+    if (password === confirm_password) {
+      fetch("http://localhost:8000/post_player/", {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRFToken': props.getToken('csrftoken')
+        },
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({
+          nickname: nickname,
+          password: password
+        })
+      }).then(res => res.json())
+      .then(res => props.handleLogin(nickname, password, props.getToken('csrftoken')))
+    }
+    history.push('/')
   }
 
   return (

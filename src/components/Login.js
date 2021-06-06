@@ -10,7 +10,6 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { withRouter, useHistory } from 'react-router-dom';
 
 function Copyright() {
   return (
@@ -46,15 +45,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Login(props) {
-  const classes = useStyles();
-  const history = useHistory();
+  const classes = useStyles();;
 
   const onSubmit = (e) => {
     e.preventDefault()
     let nickname = e.target.nickname.value;
     let password = e.target.password.value;
-    console.log(nickname, password)
-    history.push('/joingame')
+    props.handleLogin(nickname, password, props.getToken('csrftoken'));
   }
 
   return (
@@ -118,4 +115,4 @@ function Login(props) {
   );
 }
 
-export default withRouter(Login);
+export default Login;

@@ -49,7 +49,8 @@ function JoinGame(props) {
 
   const handleJoin = (e) => {
     e.preventDefault();
-    props.onJoin(e);
+    let room_code = e.target.server_id.value;
+    props.getGameByName(room_code);
     history.push(`/${e.target.server_id.value}`);
 
   }
