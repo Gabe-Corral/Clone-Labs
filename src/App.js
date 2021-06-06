@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
@@ -7,73 +7,108 @@ import JoinGame from './components/JoinGame';
 import Game from './components/Game';
 import './App.css';
 
-export default function App() {
-  const [player, setPlayer] = useState({});
-  const [game, setGame] = useState({});
+class App extends React.Component {
 
-  const onJoin = (e) => {
-    e.preventDefault()
-    let room_code = e.target.server_id.value;
-    getGameByName(room_code);
+  constructor() {
+    super();
+
+    this.state = {
+      loggedInStatus: false,
+      token: false,
+      player: ''
+    }
+
+    this.handleLogin = this.handleLogin.bind(this);
   }
 
-  const getGameByName = (name) => {
-    fetch(`http://localhost:8000/game_name/${name}/`)
-      .then(res => res.json())
-      .then(res => setGame(res))
+  getToken(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
   }
 
-  const onCreateGame = (e) => {
-    e.preventDefault()
-    let room_name = e.target.room_name.value;
-    createGame(room_name);
-  }
-
-  const createGame = (game_name) => {
-    fetch("http://localhost:8000/create_game/", {
+  checkLoginStatus() {
+    fetch("http://localhost:8000/authenticated/", {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': this.getToken('csrftoken')
       },
-      method: 'POST',
-      body: JSON.stringify({
-        name: game_name
-      })
+      credentials: 'include'
     }).then(res => res.json())
-    .then(res => setGame(res))
+    .then(res => {
+      if (res !== "Error") {
+        this.handleSuccessfulLogin(res)
+      }
+    })
   }
 
-  const createPlayer = (player_name) => {
-    fetch("http://localhost:8000/post_player/", {
+  componentDidMount() {
+    this.fetchToken();
+    this.checkLoginStatus()
+  }
+
+  fetchToken() {
+    fetch("http://localhost:8000/cookie/", {
+      credentials: 'include'
+    })
+  }
+
+  handleSuccessfulLogin(player) {
+    this.setState({
+      loggedInStatus: true,
+      player: player
+    })
+  }
+
+  handleLogin(nickname, password, token) {
+    fetch("http://localhost:8000/login/", {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CSRFToken': token
       },
       method: 'POST',
+      credentials: 'include',
       body: JSON.stringify({
-        nickname: player_name
+        nickname: nickname,
+        password: password
       })
     }).then(res => res.json())
-    .then(res => setPlayer(res))
+    .then(res => this.handleSuccessfulLogin(res))
   }
 
-  return (
-    <Switch>
-      <Route exact path="/">
-        <Login />
-      </Route>
-      <Route exact path="/signup">
-        <SignUp createPlayer={createPlayer} />
-      </Route>
-      <Route exact path="/joingame">
-        <JoinGame onJoin={onJoin} />
-      </Route>
-      <Route exact path="/creategame">
-        <CreateGame onCreateGame={onCreateGame} />
-      </Route>
-      <Route path="/:name">
-        <Game player={player} game={game} />
-      </Route>
-    </Switch>
-  );
+  render() {
+    return (
+      <Switch>
+        <Route exact path="/">
+          {this.state.loggedInStatus ? (
+            <JoinGame  />
+          ) : (
+            <Login getToken={this.getToken} handleLogin={this.handleLogin} />
+          )}
+        </Route>
+        <Route exact path="/signup">
+          <SignUp getToken={this.getToken} handleLogin={this.handleLogin} />
+        </Route>
+        <Route exact path="/creategame">
+          <CreateGame />
+        </Route>
+        <Route path="/:name">
+          <Game />
+        </Route>
+      </Switch>
+    );
+  }
 }
+
+export default App

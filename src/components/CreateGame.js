@@ -50,7 +50,8 @@ function CreateGame(props) {
 
   const handleCreateGame = (e) => {
     e.preventDefault();
-    props.onCreateGame(e);
+    let room_name = e.target.room_name.value;
+    props.createGame(room_name);
     history.push(`/${e.target.room_name.value}`);
   }
 
