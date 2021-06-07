@@ -14,7 +14,6 @@ class App extends React.Component {
 
     this.state = {
       loggedInStatus: false,
-      token: false,
       player: ''
     }
 
@@ -54,7 +53,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.fetchToken();
-    this.checkLoginStatus()
+    this.checkLoginStatus();
   }
 
   fetchToken() {
@@ -104,7 +103,7 @@ class App extends React.Component {
           <CreateGame />
         </Route>
         <Route path="/:name">
-          <Game />
+          <Game player={this.state.player} />
         </Route>
       </Switch>
     );

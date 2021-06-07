@@ -51,7 +51,19 @@ function CreateGame(props) {
   const handleCreateGame = (e) => {
     e.preventDefault();
     let room_name = e.target.room_name.value;
-    props.createGame(room_name);
+
+    fetch("http://localhost:8000/create_game/", {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        name: room_name
+      })
+    }).then(res => res.json())
+    .then(res => console.log(res))
+
     history.push(`/${e.target.room_name.value}`);
   }
 
