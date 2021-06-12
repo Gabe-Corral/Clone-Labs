@@ -49,8 +49,8 @@ function JoinGame(props) {
 
   const handleJoin = (e) => {
     e.preventDefault();
-    let room_code = e.target.server_id.value;
-    history.push(`/${e.target.server_id.value}`);
+    let room_name = e.target.server_id.value;
+    history.push(`/${room_name}`);
   }
 
   return (

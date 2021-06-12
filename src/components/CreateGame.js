@@ -59,7 +59,8 @@ function CreateGame(props) {
       },
       method: 'POST',
       body: JSON.stringify({
-        name: room_name
+        name: room_name,
+        host_id: props.player.id
       })
     }).then(res => res.json())
     .then(res => console.log(res))
