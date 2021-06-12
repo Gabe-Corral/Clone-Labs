@@ -21,11 +21,13 @@ const JoinList = (props) => {
     			</ul>
     		</section>
       </div>
-        <div class="box">
-          <a href="#" class="btn btn-white btn-animation-1">Start Game</a>
-        </div>
+        {props.current_player.id === props.game.host_id ? (
+          <div className="box">
+            <a href="fakepath" onClick={props.onGameStart} className="btn btn-white btn-animation-1">Start Game</a>
+          </div>
+        ) : "" }
     </div>
   )
 }
 
-export default JoinList
+export default JoinList;

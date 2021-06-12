@@ -100,7 +100,7 @@ class App extends React.Component {
           <SignUp getToken={this.getToken} handleLogin={this.handleLogin} />
         </Route>
         <Route exact path="/creategame">
-          <CreateGame />
+          <CreateGame player={this.state.player} />
         </Route>
         <Route path="/:name">
           <Game player={this.state.player} />
