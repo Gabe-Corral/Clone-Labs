@@ -3,6 +3,7 @@ import JoinList from './JoinList';
 import PlayerCard from './PlayerCard';
 import CurrentPlayer from './CurrentPlayer';
 import ActiveCard from './ActiveCard';
+import Winner from './winner';
 import io from 'socket.io-client';
 
 const ENDPOINT = 'http://localhost:5000';
@@ -17,7 +18,8 @@ const Game = (props) => {
   const [playerTurn, setPlayerTurn] = useState('');
   const [playerHands, setPlayerHands] = useState({});
   const [activeCard, setActiveCard] = useState('');
-  const [currentColor, setCurrentColor] = useState('');
+  const [currentColor, setCurrentColor] = useState('red');
+  const [winner, setWinner] = useState('');
 
   useEffect(() => {
     let game_name = window.location.pathname.split("/")[1];
@@ -33,7 +35,8 @@ const Game = (props) => {
     socket = io.connect(ENDPOINT, connectionOptions);
     let data = {
       room: game_name,
-      player: props.player.nickname}
+      player: props.player.nickname
+    }
 
     socket.emit('join', data, (error) => {
       if (error) console.log("error: ", error);
@@ -52,7 +55,7 @@ const Game = (props) => {
       setCurrentColor(currentColor);
     })
 
-    socket.on('updateGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor}) => {
+    socket.on('updateGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor, winner}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
       setPlayerHands(playerHands);
@@ -60,6 +63,7 @@ const Game = (props) => {
       setActiveCard(activeCard);
       setGameStart(gameStart);
       setCurrentColor(currentColor);
+      setWinner(winner);
     })
 
     socket.on("roomData", ({ users }) => {
@@ -127,8 +131,8 @@ const Game = (props) => {
   }
 
   const onColorSelect = (newCard) => {
-    if (newCard.number === 13) {
-      let newColor = prompt('Enter first letter of new color (red/green/blue/yellow)').toLowerCase();
+    if (newCard.number >= 13) {
+      let newColor = prompt('Enter the new color (red/green/blue/yellow)').toLowerCase();
       return newColor;
     } else {
       return newCard.color;
@@ -141,16 +145,42 @@ const Game = (props) => {
     }
   }
 
+  const onMultiDraw = (player, cards) => {
+    let new_player = updatePlayerTurn(player);
+    let new_cards = deck.splice(0, cards);
+    playerHands[new_player].push(...new_cards);
+
+    socket.emit('updateGameState', {
+      gameOver: false,
+      playerTurn: new_player,
+      playerHands: playerHands,
+      deck: deck,
+      activeCard: activeCard,
+      gameStart: true,
+      currentColor: currentColor,
+      winner: winner
+    })
+  }
+
+  const checkForWinner = (newHands) => {
+    for (let key in newHands) {
+      if (newHands[key].length === 0) {
+        return key;
+      }
+    }
+    return false
+  }
 
   const onGameUpdate = (newHands, newCard, player, reverse=false, skip=false) => {
     socket.emit('updateGameState', {
-      gameOver: false,
+      gameOver: checkForWinner(newHands) === false ? false : true,
       playerTurn: updatePlayerTurn(player, reverse, skip),
       playerHands: newHands,
       deck: deck,
       activeCard: newCard,
       gameStart: true,
-      currentColor: onColorSelect(newCard)
+      currentColor: onColorSelect(newCard),
+      winner: checkForWinner(newHands)
     })
   }
 
@@ -190,36 +220,41 @@ const Game = (props) => {
   }
 
   return (
-    <div className="game_board">
+    <div className={currentColor}>
       {gameStart ? (
-        <div>
-          <button
-          className="draw_btn"
-          onClick={onDrawCard}
-          name={props.player.nickname}>
-          Draw
-          </button>
+        gameOver ? (
+          <Winner winner={winner}/>
+        ) : (
+          <div>
+            <button
+            className="draw_btn"
+            onClick={onDrawCard}
+            name={props.player.nickname}>
+            Draw
+            </button>
 
-          <PlayerCard
-          playerHands={playerHands}
-          current_player={props.player.nickname}
-          turn={playerTurn}
-          />
-
-          <ActiveCard
-          card={activeCard.name}
-          />
-
-          <CurrentPlayer
-            hands={playerHands}
-            hand={playerHands[props.player.nickname]}
-            player={props.player.nickname}
+            <PlayerCard
+            playerHands={playerHands}
+            current_player={props.player.nickname}
             turn={playerTurn}
-            activeCard={activeCard}
-            onGameUpdate={onGameUpdate}
-            currentColor={currentColor}
-          />
-        </div>
+            />
+
+            <ActiveCard
+            card={activeCard.name}
+            />
+
+            <CurrentPlayer
+              hands={playerHands}
+              hand={playerHands[props.player.nickname]}
+              player={props.player.nickname}
+              turn={playerTurn}
+              activeCard={activeCard}
+              onGameUpdate={onGameUpdate}
+              currentColor={currentColor}
+              onMultiDraw={onMultiDraw}
+            />
+          </div>
+        )
       ) : (
         <JoinList
         players={players}
