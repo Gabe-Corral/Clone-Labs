@@ -196,6 +196,10 @@
 	margin-bottom: 5px;
 }
 
+.tilesWrap li .highlight_name {
+  color: green !important;
+}
+
 .tilesWrap li button:before {
 	content: '';
 	position: absolute;
@@ -291,4 +295,30 @@
   margin-right: auto;
   width: 10%;
   height: auto;
+}
+
+.draw_btn {
+  width: 130px;
+  height: 40px;
+  padding: 10px 25px;
+  border: 2px solid #000;
+  font-family: 'Lato', sans-serif;
+  font-weight: 500;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+/* 1 */
+.draw_btn {
+  transition: all 0.3s ease;
+}
+.draw_btn:hover {
+   box-shadow:
+   -7px -7px 20px 0px #fff9,
+   -4px -4px 5px 0px #fff9,
+   7px 7px 20px 0px #0002,
+   4px 4px 5px 0px #0001;
 }
