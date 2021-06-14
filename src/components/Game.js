@@ -17,7 +17,7 @@ const Game = (props) => {
   const [playerTurn, setPlayerTurn] = useState('');
   const [playerHands, setPlayerHands] = useState({});
   const [activeCard, setActiveCard] = useState('');
-  const [turnIndex, setTurnIndex] = useState(0);
+  const [currentColor, setCurrentColor] = useState('');
 
   useEffect(() => {
     let game_name = window.location.pathname.split("/")[1];
@@ -36,28 +36,30 @@ const Game = (props) => {
       player: props.player.nickname}
 
     socket.emit('join', data, (error) => {
-      if (error) console.log(error);
+      if (error) console.log("error: ", error);
     })
 
   }, [props.player.nickname])
 
   useEffect(() => {
-    socket.on('initGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart}) => {
+    socket.on('initGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
       setPlayerHands(playerHands);
       setDeck(deck);
       setActiveCard(activeCard);
       setGameStart(gameStart);
+      setCurrentColor(currentColor);
     })
 
-    socket.on('updateGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart}) => {
+    socket.on('updateGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
       setPlayerHands(playerHands);
       setDeck(deck);
       setActiveCard(activeCard);
       setGameStart(gameStart);
+      setCurrentColor(currentColor);
     })
 
     socket.on("roomData", ({ users }) => {
@@ -86,7 +88,7 @@ const Game = (props) => {
     let hands = {};
     let current_deck = deck;
 
-    players.map(p => {
+    players.forEach(p => {
       if (p.name) {
         hands[p.name] = current_deck.splice(0, 7);
       }
@@ -124,6 +126,22 @@ const Game = (props) => {
     }
   }
 
+  const onColorSelect = (newCard) => {
+    if (newCard.number === 13) {
+      let newColor = prompt('Enter first letter of new color (red/green/blue/yellow)').toLowerCase();
+      return newColor;
+    } else {
+      return newCard.color;
+    }
+  }
+
+  const initialActiveCard = () => {
+    for (let i = 0; i < deck.length; i++) {
+      if (deck[i].number <= 9) return deck[i];
+    }
+  }
+
+
   const onGameUpdate = (newHands, newCard, player, reverse=false, skip=false) => {
     socket.emit('updateGameState', {
       gameOver: false,
@@ -131,21 +149,43 @@ const Game = (props) => {
       playerHands: newHands,
       deck: deck,
       activeCard: newCard,
-      gameStart: true
+      gameStart: true,
+      currentColor: onColorSelect(newCard)
     })
   }
 
   const onGameStart = (e) => {
     e.preventDefault();
-    let playerHands = assignPlayerHands();;
+    let playerHands = assignPlayerHands();
+    let initialCard = initialActiveCard();
 
     socket.emit('initGameState', {
       gameOver: false,
       playerTurn: props.player.nickname,
       playerHands: playerHands,
       deck: deck,
-      activeCard: deck[0],
+      activeCard: initialCard,
       gameStart: true,
+      currentColor: initialCard.color
+    })
+  }
+
+  const onDrawCard = (e) => {
+    e.preventDefault();
+    let randomIndex = Math.floor(Math.random() * deck.length);
+    let name = e.target.getAttribute('name');
+    let hand = playerHands[name];
+    hand.push(deck[randomIndex]);
+    playerHands[name] = hand;
+
+    socket.emit('updateGameState', {
+      gameOver: false,
+      playerTurn: playerTurn,
+      playerHands: playerHands,
+      deck: deck,
+      activeCard: activeCard,
+      gameStart: true,
+      currentColor: currentColor
     })
   }
 
@@ -153,9 +193,17 @@ const Game = (props) => {
     <div className="game_board">
       {gameStart ? (
         <div>
+          <button
+          className="draw_btn"
+          onClick={onDrawCard}
+          name={props.player.nickname}>
+          Draw
+          </button>
+
           <PlayerCard
           playerHands={playerHands}
           current_player={props.player.nickname}
+          turn={playerTurn}
           />
 
           <ActiveCard
@@ -169,6 +217,7 @@ const Game = (props) => {
             turn={playerTurn}
             activeCard={activeCard}
             onGameUpdate={onGameUpdate}
+            currentColor={currentColor}
           />
         </div>
       ) : (
