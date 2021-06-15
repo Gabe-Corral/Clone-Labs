@@ -17,7 +17,7 @@ Once logged in you will be able to create a room or join a room. This design was
 
 As of right now, this is purely an UNO game, but I plan on adding more Kahoot/Jackbox styled games to this project.
 
-## Things To DO
+## Things To Do
 
 - Bug fixes/improve code quality
 - Add a profile page
