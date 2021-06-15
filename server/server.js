@@ -19,9 +19,10 @@ io.on('connection', socket => {
     const newUser = addUser({
       id: socket.id,
       name: payload.player,
-      room: payload.room
+      room: payload.room,
+      winPhrase: payload.winPhrase
     })
-
+    
     socket.join(newUser.room);
 
     io.to(newUser.room).emit('roomData', {room: newUser.room, users: getUsersInRoom(newUser.room)});

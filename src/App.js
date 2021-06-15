@@ -14,10 +14,12 @@ class App extends React.Component {
 
     this.state = {
       loggedInStatus: false,
-      player: ''
+      player: '',
+      winPhrase: ''
     }
 
     this.handleLogin = this.handleLogin.bind(this);
+    this.setWinPhrase = this.setWinPhrase.bind(this);
   }
 
   getToken(name) {
@@ -86,12 +88,16 @@ class App extends React.Component {
     .then(res => this.handleSuccessfulLogin(res))
   }
 
+  setWinPhrase(phrase) {
+    this.setState({ winPhrase: phrase });
+  }
+
   render() {
     return (
       <Switch>
         <Route exact path="/">
           {this.state.loggedInStatus ? (
-            <JoinGame  />
+            <JoinGame  setWinPhrase={this.setWinPhrase} />
           ) : (
             <Login getToken={this.getToken} handleLogin={this.handleLogin} />
           )}
@@ -100,10 +106,10 @@ class App extends React.Component {
           <SignUp getToken={this.getToken} handleLogin={this.handleLogin} />
         </Route>
         <Route exact path="/creategame">
-          <CreateGame player={this.state.player} />
+          <CreateGame player={this.state.player} setWinPhrase={this.setWinPhrase} />
         </Route>
         <Route path="/:name">
-          <Game player={this.state.player} />
+          <Game player={this.state.player} winPhrase={this.state.winPhrase} />
         </Route>
       </Switch>
     );

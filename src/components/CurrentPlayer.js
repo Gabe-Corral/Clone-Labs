@@ -13,11 +13,11 @@ const CurrentPlayer = (props) => {
 
   const onMove = (e) => {
     e.preventDefault();
-    //this needs to be changed
+
     if (props.turn === props.player) {
       let card_name = e.target.getAttribute('name');
       let card = findCard(card_name);
-      
+
       if (card.number === props.activeCard.number
         || card.color === props.activeCard.color
         || card.number >= 13
@@ -38,19 +38,21 @@ const CurrentPlayer = (props) => {
         } else if (card.number === 13) {
           props.onGameUpdate(props.hands, card, props.player);
         } else if (card.number === 14) {
-          props.onMultiDraw(props.player, 2);
+          props.onMultiDraw(props.player, 4);
           props.onGameUpdate(props.hands, card, props.player);
         }
       }
     }
   }
 
+  let id = 0;
   for (let i in props.hand) {
     let img = process.env.PUBLIC_URL+`/deck_assets/${props.hand[i].name}.png`;
     let name = props.hand[i].name;
+    id += 1
 
     elements.push(
-      <div className="colum" key={name}>
+      <div className="colum" key={id}>
         <img
         className="player_cards"
         src={img} alt={props.hand[i].name}

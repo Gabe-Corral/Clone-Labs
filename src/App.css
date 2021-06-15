@@ -38,10 +38,10 @@
 
 .frame {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 400px;
-  height: 400px;
+  top: 45%;
+  left: 45%;
+  width: 600px;
+  height: 600px;
   margin-top: -200px;
   margin-left: -200px;
   border-radius: 2px;
@@ -112,7 +112,7 @@
 
 .box{
   position:absolute;
-  left:50%;
+  left: 50%;
   bottom: 0;
   transform : translate(-50% ,-50%);
 }
@@ -296,6 +296,7 @@
   background: linear-gradient(to right, #0ABFBC, #FC354C);
 }
 
+/* card images */
 .row {
   display: flex;
   position: absolute;
@@ -329,7 +330,7 @@
   border: 2px solid #000;
   font-family: 'Lato', sans-serif;
   font-weight: 500;
-  background: transparent;
+  background-color: #F8F8FF;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
@@ -365,18 +366,20 @@ p {
 	line-height: 21px;
 }
 
+.winner {
+  justify-content: center;
+}
+
 .card-container {
 	background-color: #231E39;
 	border-radius: 5px;
 	box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+  position: relative;
 	color: #B3B8CD;
-	padding-top: 30px;
-	position: relative;
 	width: 350px;
 	max-width: 100%;
 	text-align: center;
   margin: 0 auto;
-  top: 50%;
 }
 
 .card-container .pro {
