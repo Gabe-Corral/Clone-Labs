@@ -5,6 +5,7 @@ import CurrentPlayer from './CurrentPlayer';
 import ActiveCard from './ActiveCard';
 import Winner from './winner';
 import io from 'socket.io-client';
+import Flip from 'react-reveal/Flip';
 
 const ENDPOINT = 'http://localhost:5000';
 let socket;
@@ -35,14 +36,15 @@ const Game = (props) => {
     socket = io.connect(ENDPOINT, connectionOptions);
     let data = {
       room: game_name,
-      player: props.player.nickname
+      player: props.player.nickname,
+      winPhrase: props.winPhrase
     }
 
     socket.emit('join', data, (error) => {
       if (error) console.log("error: ", error);
     })
 
-  }, [props.player.nickname])
+  })
 
   useEffect(() => {
     socket.on('initGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor}) => {
@@ -55,7 +57,7 @@ const Game = (props) => {
       setCurrentColor(currentColor);
     })
 
-    socket.on('updateGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor, winner}) => {
+    socket.on('updateGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor, winner, players}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
       setPlayerHands(playerHands);
@@ -64,6 +66,7 @@ const Game = (props) => {
       setGameStart(gameStart);
       setCurrentColor(currentColor);
       setWinner(winner);
+      setPlayers(players);
     })
 
     socket.on("roomData", ({ users }) => {
@@ -102,31 +105,34 @@ const Game = (props) => {
   }
 
   const updatePlayerTurn = (player, reverse=false, skip=false) => {
+    let playerList = Array.from(players);
     let index;
-    for (let i = 0; i < players.length; i++) {
-      if (players[i].name === player) {
+    for (let i = 0; i < playerList.length; i++) {
+      if (playerList[i].name === player) {
         index = i;
       }
     }
-    //this needs to be changed
-    if (reverse && index !== 0) {
-      let player = players[index-1].name;
-      setPlayers(players.reverse());
+    //needs to be fixed
+    if (reverse && playerList.length === 2) {
       return player;
+    } else if (reverse && index !== 0) {
+      setPlayers(players.reverse())
+      return playerList[index-1].name;
     } else if (reverse && index === 0) {
-      let player = players[players.length-1].name;
-      setPlayers(players.reverse());
+      setPlayers(players.reverse())
+      return playerList[playerList.length-1].name;
+    } else if (skip && playerList.length === 2) {
       return player;
-    } else if (skip) {
-      if (players.length > index+2) {
-        return players[index+2].name;
-      } else {
-        return players[1].name;
-      }
-    } else if (players.length > index+1) {
-      return players[index+1].name;
+    } else if (skip && playerList.length-1 === index) {
+      return playerList[1].name;
+    } else if (skip && playerList.length-1 >= index+2) {
+      return playerList[index+2].name;
+    } else if (skip && playerList.length-1 <= index+2) {
+      return playerList[0].name;
+    } else if (playerList.length-1 === index) {
+      return playerList[0].name;
     } else {
-      return players[0].name;
+      return playerList[index+1].name;
     }
   }
 
@@ -158,7 +164,8 @@ const Game = (props) => {
       activeCard: activeCard,
       gameStart: true,
       currentColor: currentColor,
-      winner: winner
+      winner: winner,
+      players: players
     })
   }
 
@@ -168,7 +175,7 @@ const Game = (props) => {
         return key;
       }
     }
-    return false
+    return false;
   }
 
   const onGameUpdate = (newHands, newCard, player, reverse=false, skip=false) => {
@@ -180,7 +187,8 @@ const Game = (props) => {
       activeCard: newCard,
       gameStart: true,
       currentColor: onColorSelect(newCard),
-      winner: checkForWinner(newHands)
+      winner: checkForWinner(newHands),
+      players: players
     })
   }
 
@@ -215,7 +223,8 @@ const Game = (props) => {
       deck: deck,
       activeCard: activeCard,
       gameStart: true,
-      currentColor: currentColor
+      currentColor: currentColor,
+      players: players
     })
   }
 
@@ -223,7 +232,14 @@ const Game = (props) => {
     <div className={currentColor}>
       {gameStart ? (
         gameOver ? (
-          <Winner winner={winner}/>
+          <Flip left>
+            <Winner
+            winner={winner}
+            players={players}
+            player_id={props.player.id}
+            game={game}
+            />
+          </Flip>
         ) : (
           <div>
             <button

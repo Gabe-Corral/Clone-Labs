@@ -50,6 +50,8 @@ function JoinGame(props) {
   const handleJoin = (e) => {
     e.preventDefault();
     let room_name = e.target.server_id.value;
+    let winPhrase = e.target.win_phrase.value;
+    props.setWinPhrase(winPhrase);
     history.push(`/${room_name}`);
   }
 
@@ -70,6 +72,15 @@ function JoinGame(props) {
                 label="Server Code"
                 id="server_id"
               />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="win_phrase"
+                label="Winning Phrase"
+                id="win_phrase"
+              />
               <Button
                 type="submit"
                 fullWidth
@@ -83,6 +94,11 @@ function JoinGame(props) {
                 <Grid item xs>
                   <Link href="creategame" variant="body2">
                     Create Game
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link href="/profile" variant="body2">
+                    Profile
                   </Link>
                 </Grid>
               </Grid>

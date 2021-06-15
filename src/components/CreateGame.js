@@ -51,6 +51,7 @@ function CreateGame(props) {
   const handleCreateGame = (e) => {
     e.preventDefault();
     let room_name = e.target.room_name.value;
+    let winPhrase = e.target.win_phrase.value;
 
     fetch("http://localhost:8000/create_game/", {
       headers: {
@@ -65,6 +66,7 @@ function CreateGame(props) {
     }).then(res => res.json())
     .then(res => console.log(res))
 
+    props.setWinPhrase(winPhrase);
     history.push(`/${e.target.room_name.value}`);
   }
 
@@ -84,6 +86,15 @@ function CreateGame(props) {
                 name="room_name"
                 label="Room Name"
                 id="room_name"
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="win_phrase"
+                label="Winning Phrase"
+                id="win_phrase"
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
