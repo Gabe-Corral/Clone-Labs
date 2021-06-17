@@ -1,3 +1,6 @@
+//This is a slightly modified verion of this => https://github.com/mizanxali/uno-online/blob/master/server.js
+//The code found above was made based off of this tutorial => https://www.youtube.com/watch?v=jD7FnbI76Hg
+
 const socketio = require('socket.io')
 const express = require('express')
 const http = require('http')
@@ -22,7 +25,7 @@ io.on('connection', socket => {
       room: payload.room,
       winPhrase: payload.winPhrase
     })
-    
+
     socket.join(newUser.room);
 
     io.to(newUser.room).emit('roomData', {room: newUser.room, users: getUsersInRoom(newUser.room)});

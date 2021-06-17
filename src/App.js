@@ -11,7 +11,6 @@ class App extends React.Component {
 
   constructor() {
     super();
-
     this.state = {
       loggedInStatus: false,
       player: '',
@@ -38,7 +37,7 @@ class App extends React.Component {
   }
 
   checkLoginStatus() {
-    fetch("http://localhost:8000/authenticated/", {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/authenticated/`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -59,7 +58,7 @@ class App extends React.Component {
   }
 
   fetchToken() {
-    fetch("http://localhost:8000/cookie/", {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/cookie/`, {
       credentials: 'include'
     })
   }
@@ -72,7 +71,7 @@ class App extends React.Component {
   }
 
   handleLogin(nickname, password, token) {
-    fetch("http://localhost:8000/login/", {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/login/`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -97,19 +96,33 @@ class App extends React.Component {
       <Switch>
         <Route exact path="/">
           {this.state.loggedInStatus ? (
-            <JoinGame  setWinPhrase={this.setWinPhrase} />
+            <JoinGame
+            setWinPhrase={this.setWinPhrase}
+            />
           ) : (
-            <Login getToken={this.getToken} handleLogin={this.handleLogin} />
+            <Login
+            getToken={this.getToken}
+            handleLogin={this.handleLogin}
+            />
           )}
         </Route>
         <Route exact path="/signup">
-          <SignUp getToken={this.getToken} handleLogin={this.handleLogin} />
+          <SignUp
+          getToken={this.getToken}
+          handleLogin={this.handleLogin}
+          />
         </Route>
         <Route exact path="/creategame">
-          <CreateGame player={this.state.player} setWinPhrase={this.setWinPhrase} />
+          <CreateGame
+          player={this.state.player}
+          setWinPhrase={this.setWinPhrase}
+          />
         </Route>
         <Route path="/:name">
-          <Game player={this.state.player} winPhrase={this.state.winPhrase} />
+          <Game
+          player={this.state.player}
+          winPhrase={this.state.winPhrase}
+          />
         </Route>
       </Switch>
     );

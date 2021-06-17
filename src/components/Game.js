@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import JoinList from './JoinList';
 import PlayerCard from './PlayerCard';
 import CurrentPlayer from './CurrentPlayer';
@@ -11,6 +11,7 @@ const ENDPOINT = 'http://localhost:5000';
 let socket;
 
 const Game = (props) => {
+  const gameName = window.location.pathname.split("/")[1];
   const [players, setPlayers] = useState([]);
   const [game, setGame] = useState({});
   const [deck, setDeck] = useState([]);
@@ -22,10 +23,18 @@ const Game = (props) => {
   const [currentColor, setCurrentColor] = useState('red');
   const [winner, setWinner] = useState('');
 
-  useEffect(() => {
-    let game_name = window.location.pathname.split("/")[1];
-    getGame(game_name);
+  const getGame = useCallback(() => {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/game_name/${gameName}/`)
+      .then(res => res.json())
+      .then(res => {
+        setGame(res);
+        if (props.player.id === res.host_id) {
+          getDeck(res.id);
+        }
+      })
+  }, [gameName, props.player.id])
 
+  const onConnect = useCallback(() => {
     const connectionOptions =  {
       "forceNew" : true,
       "reconnectionAttempts": "Infinity",
@@ -35,7 +44,7 @@ const Game = (props) => {
 
     socket = io.connect(ENDPOINT, connectionOptions);
     let data = {
-      room: game_name,
+      room: gameName,
       player: props.player.nickname,
       winPhrase: props.winPhrase
     }
@@ -43,8 +52,12 @@ const Game = (props) => {
     socket.emit('join', data, (error) => {
       if (error) console.log("error: ", error);
     })
+  }, [props.player.nickname, props.winPhrase, gameName])
 
-  })
+  useEffect(() => {
+    getGame();
+    onConnect();
+  }, [onConnect, getGame])
 
   useEffect(() => {
     socket.on('initGameState', ({gameOver, playerTurn, playerHands, deck, activeCard, gameStart, currentColor}) => {
@@ -74,19 +87,8 @@ const Game = (props) => {
     })
   }, [])
 
-  const getGame = (game_name) => {
-    fetch(`http://localhost:8000/game_name/${game_name}/`)
-      .then(res => res.json())
-      .then(res => {
-        setGame(res);
-        if (props.player.id === res.host_id) {
-          getDeck(res.id)
-        }
-      })
-  }
-
   const getDeck = (game_id) => {
-    fetch(`http://localhost:8000/game/${game_id}/cards/`)
+    fetch(`${process.env.REACT_APP_.BASE_URL}/game/${game_id}/cards/`)
       .then(res => res.json())
       .then(res => setDeck(res))
   }
@@ -100,6 +102,7 @@ const Game = (props) => {
         hands[p.name] = current_deck.splice(0, 7);
       }
     })
+
     setDeck(current_deck);
     return hands;
   }
@@ -107,12 +110,13 @@ const Game = (props) => {
   const updatePlayerTurn = (player, reverse=false, skip=false) => {
     let playerList = Array.from(players);
     let index;
+
     for (let i = 0; i < playerList.length; i++) {
       if (playerList[i].name === player) {
         index = i;
       }
     }
-    //needs to be fixed
+
     if (reverse && playerList.length === 2) {
       return player;
     } else if (reverse && index !== 0) {
@@ -137,9 +141,17 @@ const Game = (props) => {
   }
 
   const onColorSelect = (newCard) => {
+    const colorOptions = ['red', 'blue', 'yellow', 'green'];
+
     if (newCard.number >= 13) {
       let newColor = prompt('Enter the new color (red/green/blue/yellow)').toLowerCase();
-      return newColor;
+
+      if (colorOptions.includes(newColor)) {
+        return newColor;
+      } else {
+        return colorOptions[Math.floor(Math.random() * colorOptions.length)];
+      }
+
     } else {
       return newCard.color;
     }
@@ -211,10 +223,9 @@ const Game = (props) => {
   const onDrawCard = (e) => {
     e.preventDefault();
     let randomIndex = Math.floor(Math.random() * deck.length);
-    let name = e.target.getAttribute('name');
-    let hand = playerHands[name];
+    let hand = playerHands[props.player.nickname];
     hand.push(deck[randomIndex]);
-    playerHands[name] = hand;
+    playerHands[props.player.nickname] = hand;
 
     socket.emit('updateGameState', {
       gameOver: false,
@@ -242,13 +253,6 @@ const Game = (props) => {
           </Flip>
         ) : (
           <div>
-            <button
-            className="draw_btn"
-            onClick={onDrawCard}
-            name={props.player.nickname}>
-            Draw
-            </button>
-
             <PlayerCard
             playerHands={playerHands}
             current_player={props.player.nickname}
@@ -257,8 +261,8 @@ const Game = (props) => {
 
             <ActiveCard
             card={activeCard.name}
+            onDrawCard={onDrawCard}
             />
-
             <CurrentPlayer
               hands={playerHands}
               hand={playerHands[props.player.nickname]}
@@ -284,3 +288,7 @@ const Game = (props) => {
 }
 
 export default Game;
+//bugs
+//update winner
+//animations
+//get ready to deploy

@@ -23,7 +23,12 @@ const JoinList = (props) => {
       </div>
         {props.current_player.id === props.game.host_id ? (
           <div className="box">
-            <a href="fakepath" onClick={props.onGameStart} className="btn btn-white btn-animation-1">Start Game</a>
+            <a
+            href="fakepath"
+            onClick={props.onGameStart}
+            className="btn btn-white btn-animation-1">
+            Start Game
+            </a>
           </div>
         ) : "" }
     </div>
