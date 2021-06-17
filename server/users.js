@@ -1,3 +1,6 @@
+//This is a slightly modified verion of this => https://github.com/mizanxali/uno-online/blob/master/users.js
+//The code found above was made based off of this tutorial => https://www.youtube.com/watch?v=jD7FnbI76Hg
+
 const users = [];
 
 const addUser = ({id, name, room, winPhrase}) => {

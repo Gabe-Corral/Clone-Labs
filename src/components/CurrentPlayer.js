@@ -1,4 +1,5 @@
 import React from 'react';
+import Fade from 'react-reveal/Fade';
 
 const CurrentPlayer = (props) => {
   let elements = [];
@@ -53,11 +54,14 @@ const CurrentPlayer = (props) => {
 
     elements.push(
       <div className="colum" key={id}>
-        <img
-        className="player_cards"
-        src={img} alt={props.hand[i].name}
-        name={name}
-        onClick={onMove}/>
+      <Fade right>
+          <img
+          className="player_cards"
+          src={img}
+          alt={props.hand[i].name}
+          name={name}
+          onClick={onMove}/>
+      </Fade>
       </div>
     )
   }

@@ -315,6 +315,18 @@
   height: auto;
 }
 
+.active_card_container {
+  display: flex;
+}
+
+.back_card {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 10%;
+  height: auto;
+}
+
 .active_card {
   display: block;
   margin-left: auto;
@@ -323,7 +335,7 @@
   height: auto;
 }
 
-.draw_btn {
+/* .draw_btn {
   width: 130px;
   height: 40px;
   padding: 10px 25px;
@@ -337,7 +349,6 @@
   display: inline-block;
 }
 
-/* 1 */
 .draw_btn {
   transition: all 0.3s ease;
 }
@@ -347,7 +358,7 @@
    -4px -4px 5px 0px #fff9,
    7px 7px 20px 0px #0002,
    4px 4px 5px 0px #0001;
-}
+} */
 
 /* winning card */
 @import url('https://fonts.googleapis.com/css?family=Montserrat');
@@ -393,4 +404,3 @@ p {
 	top: 30px;
 	left: 30px;
 }
-/* winning card */

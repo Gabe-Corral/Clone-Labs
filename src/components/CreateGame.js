@@ -53,7 +53,7 @@ function CreateGame(props) {
     let room_name = e.target.room_name.value;
     let winPhrase = e.target.win_phrase.value;
 
-    fetch("http://localhost:8000/create_game/", {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/create_game/`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'

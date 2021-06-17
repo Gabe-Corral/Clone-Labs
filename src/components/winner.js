@@ -1,14 +1,14 @@
-import React, {useEffect} from 'react';
-import Confetti from 'react-confetti'
+import React, { useEffect } from 'react';
+import Confetti from 'react-confetti';
 
 const Winner = (props) => {
 
 const width = window.innerWidth;
-const height = window.innerHeight ;
+const height = window.innerHeight;
 
 useEffect(() => {
   if (props.game.host_id === props.player_id) {
-    fetch(`http://localhost:8000/patch_game/${props.game.id}/`, {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/patch_game/${props.game.id}/`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
