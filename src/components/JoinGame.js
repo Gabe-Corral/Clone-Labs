@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function JoinGame(props) {
+const JoinGame = (props) => {
   const classes = useStyles();
   const history = useHistory();
 
@@ -55,7 +55,7 @@ function JoinGame(props) {
                 required
                 fullWidth
                 name="server_id"
-                label="Server Code"
+                label="Room Name"
                 id="server_id"
               />
               <TextField

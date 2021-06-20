@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from "react-router-dom";
 import JoinList from './JoinList';
 import PlayerCard from './PlayerCard';
 import CurrentPlayer from './CurrentPlayer';
 import ActiveCard from './ActiveCard';
 import Winner from './winner';
-import io from 'socket.io-client';
 import Flip from 'react-reveal/Flip';
+import io from 'socket.io-client';
 
 const ENDPOINT = 'http://localhost:5000';
 let socket;
 
 const Game = (props) => {
+  const history = useHistory();
   const gameName = window.location.pathname.split("/")[1];
   const [players, setPlayers] = useState([]);
   const [game, setGame] = useState({});
@@ -31,8 +33,10 @@ const Game = (props) => {
         if (props.player.id === res.host_id) {
           getDeck(res.id);
         }
+      }).catch(error => {
+        history.push("/")
       })
-  }, [gameName, props.player.id])
+  }, [gameName, props.player.id, history])
 
   const onConnect = useCallback(() => {
     const connectionOptions =  {
@@ -88,7 +92,7 @@ const Game = (props) => {
   }, [])
 
   const getDeck = (game_id) => {
-    fetch(`${process.env.REACT_APP_.BASE_URL}/game/${game_id}/cards/`)
+    fetch(`${process.env.REACT_APP_.BASE_URL}/cards/`)
       .then(res => res.json())
       .then(res => setDeck(res))
   }
@@ -258,7 +262,6 @@ const Game = (props) => {
             current_player={props.player.nickname}
             turn={playerTurn}
             />
-
             <ActiveCard
             card={activeCard.name}
             onDrawCard={onDrawCard}
@@ -288,7 +291,3 @@ const Game = (props) => {
 }
 
 export default Game;
-//bugs
-//update winner
-//animations
-//get ready to deploy

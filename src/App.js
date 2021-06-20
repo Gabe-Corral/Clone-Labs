@@ -49,7 +49,7 @@ class App extends React.Component {
       if (res !== "Error") {
         this.handleSuccessfulLogin(res)
       }
-    })
+    }).catch(error => console.log(error))
   }
 
   componentDidMount() {
@@ -85,6 +85,7 @@ class App extends React.Component {
       })
     }).then(res => res.json())
     .then(res => this.handleSuccessfulLogin(res))
+    .catch(error => console.log(error))
   }
 
   setWinPhrase(phrase) {
