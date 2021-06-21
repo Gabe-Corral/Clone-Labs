@@ -41,9 +41,9 @@ class App extends React.Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://uno-back-end.herokuapp.com',
         'X-CSRFToken': this.getToken('csrftoken')
       },
+      mode: "no-cors",
       credentials: 'include'
     }).then(res => res.json())
     .then(res => {
@@ -60,9 +60,7 @@ class App extends React.Component {
 
   fetchToken() {
     fetch(`${process.env.REACT_APP_.BASE_URL}/cookie/`, {
-      headers: {
-        'Access-Control-Allow-Origin': 'https://uno-back-end.herokuapp.com'
-      },
+      mode: "no-cors",
       credentials: 'include'
     })
   }
@@ -79,9 +77,9 @@ class App extends React.Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://uno-back-end.herokuapp.com',
         'X-CSRFToken': token
       },
+      mode: "no-cors",
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify({
