@@ -41,7 +41,8 @@ const CreateGame = (props) => {
     fetch(`${process.env.REACT_APP_.BASE_URL}/create_game/`, {
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': 'https://uno-back-end.herokuapp.com'
       },
       method: 'POST',
       body: JSON.stringify({
