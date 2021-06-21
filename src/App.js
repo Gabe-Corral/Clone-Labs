@@ -41,7 +41,6 @@ class App extends React.Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': true,
         'X-CSRFToken': this.getToken('csrftoken')
       },
       credentials: 'include'
@@ -76,7 +75,6 @@ class App extends React.Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Credentials': true,
         'X-CSRFToken': token
       },
       method: 'POST',
