@@ -44,7 +44,6 @@ const SignUp = (props) => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'https://uno-back-end.herokuapp.com',
           'X-CSRFToken': props.getToken('csrftoken'),
         },
         method: 'POST',
