@@ -43,7 +43,7 @@ class App extends React.Component {
         'Content-Type': 'application/json',
         'X-CSRFToken': this.getToken('csrftoken')
       },
-      credentials: 'include'
+      credentials: 'same-origin'
     }).then(res => res.json())
     .then(res => {
       if (res !== "Error") {
@@ -59,7 +59,7 @@ class App extends React.Component {
 
   fetchToken() {
     fetch(`${process.env.REACT_APP_.BASE_URL}/cookie/`, {
-      credentials: 'include'
+      credentials: 'same-origin'
     })
   }
 
