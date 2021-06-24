@@ -47,7 +47,7 @@ const SignUp = (props) => {
           'X-CSRFToken': props.getToken('csrftoken'),
         },
         method: 'POST',
-        credentials: 'same-origin',
+        credentials: 'include',
         body: JSON.stringify({
           nickname: nickname,
           password: password
