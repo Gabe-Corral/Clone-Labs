@@ -41,7 +41,7 @@ class App extends React.Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'X-CSRFToken': this.getToken('csrftoken'),
+        'X-CSRFToken': this.getToken('csrftoken')
       },
       credentials: 'include'
     }).then(res => res.json())
