@@ -38,7 +38,7 @@ const SignUp = (props) => {
     let nickname = e.target.nickname.value;
     let password = e.target.password.value;
     let confirm_password = e.target.password_con.value;
-
+    
     if (password === confirm_password) {
       fetch(`${process.env.REACT_APP_.BASE_URL}/post_player/`, {
         headers: {
@@ -46,7 +46,6 @@ const SignUp = (props) => {
           'Content-Type': 'application/json',
           'X-CSRFToken': props.getToken('csrftoken'),
         },
-        mode: "no-cors",
         method: 'POST',
         credentials: 'include',
         body: JSON.stringify({

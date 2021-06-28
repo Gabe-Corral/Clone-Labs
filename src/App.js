@@ -41,9 +41,8 @@ class App extends React.Component {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'X-CSRFToken': this.getToken('csrftoken')
+        'X-CSRFToken': this.getToken('csrftoken'),
       },
-      mode: "no-cors",
       credentials: 'include'
     }).then(res => res.json())
     .then(res => {
@@ -60,7 +59,6 @@ class App extends React.Component {
 
   fetchToken() {
     fetch(`${process.env.REACT_APP_.BASE_URL}/cookie/`, {
-      mode: "no-cors",
       credentials: 'include'
     })
   }
@@ -79,7 +77,6 @@ class App extends React.Component {
         'Content-Type': 'application/json',
         'X-CSRFToken': token
       },
-      mode: "no-cors",
       method: 'POST',
       credentials: 'include',
       body: JSON.stringify({

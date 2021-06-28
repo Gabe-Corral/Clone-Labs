@@ -291,3 +291,8 @@ const Game = (props) => {
 }
 
 export default Game;
+//to do
+//open source back-end
+//update readme(s)
+//update resume
+//deploy
