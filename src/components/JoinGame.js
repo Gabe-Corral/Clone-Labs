@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -7,6 +7,10 @@ import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
 import { withRouter, useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -32,13 +36,20 @@ const useStyles = makeStyles((theme) => ({
 const JoinGame = (props) => {
   const classes = useStyles();
   const history = useHistory();
+  const [gameType, setGameType] = useState('UNO');
+
+  const handleGameChange = (e) => {
+    e.preventDefault();
+    setGameType(e.target.value);
+  }
 
   const handleJoin = (e) => {
     e.preventDefault();
     let room_name = e.target.server_id.value;
     let winPhrase = e.target.win_phrase.value;
+    props.setGameName(room_name);
     props.setWinPhrase(winPhrase);
-    history.push(`/${room_name}`);
+    history.push(`/${gameType.toLowerCase()}/${room_name}`);
   }
 
   return (
@@ -58,6 +69,18 @@ const JoinGame = (props) => {
                 label="Room Name"
                 id="server_id"
               />
+              <FormControl className={classes.formControl}>
+              <InputLabel id="demo-simple-select-label">Game</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={gameType}
+                  onChange={handleGameChange}
+                >
+                <MenuItem value="UNO">UNO</MenuItem>
+                <MenuItem value="SCRIBBLE">SCRIBBLE</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -83,7 +106,7 @@ const JoinGame = (props) => {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="/profile" variant="body2">
+                  <Link href="/dashboard" variant="body2">
                     Profile
                   </Link>
                 </Grid>

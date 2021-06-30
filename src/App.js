@@ -4,7 +4,8 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import CreateGame from './components/CreateGame';
 import JoinGame from './components/JoinGame';
-import Game from './components/Game';
+import UnoGame from './uno-components/UnoGame';
+import ScibbleGame from './scibble-components/ScibbleGame';
 import './App.css';
 
 class App extends React.Component {
@@ -14,11 +15,13 @@ class App extends React.Component {
     this.state = {
       loggedInStatus: false,
       player: '',
-      winPhrase: ''
+      winPhrase: '',
+      gameName: ''
     }
 
     this.handleLogin = this.handleLogin.bind(this);
     this.setWinPhrase = this.setWinPhrase.bind(this);
+    this.setGameName = this.setGameName.bind(this);
   }
 
   getToken(name) {
@@ -92,12 +95,17 @@ class App extends React.Component {
     this.setState({ winPhrase: phrase });
   }
 
+  setGameName(name) {
+    this.setState({ gameName: name });
+  }
+
   render() {
     return (
       <Switch>
         <Route exact path="/">
           {this.state.loggedInStatus ? (
             <JoinGame
+            setGameName={this.setGameName}
             setWinPhrase={this.setWinPhrase}
             />
           ) : (
@@ -117,13 +125,18 @@ class App extends React.Component {
           <CreateGame
           player={this.state.player}
           setWinPhrase={this.setWinPhrase}
+          setGameName={this.setGameName}
           />
         </Route>
-        <Route path="/:name">
-          <Game
+        <Route path="/uno/:name">
+          <UnoGame
           player={this.state.player}
           winPhrase={this.state.winPhrase}
+          gameName={this.state.gameName}
           />
+        </Route>
+        <Route path="/scribble/:name">
+          <ScibbleGame />
         </Route>
       </Switch>
     );

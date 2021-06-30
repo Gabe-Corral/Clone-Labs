@@ -26,7 +26,7 @@ const CurrentPlayer = (props) => {
 
         let index = props.hands[props.player].indexOf(card);
         props.hands[props.player].splice(index, 1);
-
+        //fix this
         if (card.number <= 9) {
           props.onGameUpdate(props.hands, card, props.player);
         } else if (card.number === 10) {

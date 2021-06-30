@@ -13,7 +13,7 @@ let socket;
 
 const Game = (props) => {
   const history = useHistory();
-  const gameName = window.location.pathname.split("/")[1];
+  const gameName = props.gameName;
   const [players, setPlayers] = useState([]);
   const [game, setGame] = useState({});
   const [deck, setDeck] = useState([]);
@@ -291,8 +291,3 @@ const Game = (props) => {
 }
 
 export default Game;
-//to do
-//open source back-end
-//update readme(s)
-//update resume
-//deploy
