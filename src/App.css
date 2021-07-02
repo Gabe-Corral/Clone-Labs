@@ -404,3 +404,13 @@ p {
 	top: 30px;
 	left: 30px;
 }
+
+/* drawing canvas */
+.canvas-container {
+}
+
+.draw-canvas {
+  /* height: 50%;
+  width: 50%; */
+  background-color: #DCDCDC;
+}
