@@ -60,7 +60,7 @@ const CreateGame = (props) => {
 
     if (gameType === 'UNO') {
       createUnoGame(room_name);
-    } else if (gameType === 'SCIBBLE') {
+    } else if (gameType === 'SCRIBBLE') {
       createScibbleGame(room_name);
     }
   }
@@ -75,12 +75,14 @@ const CreateGame = (props) => {
       body: JSON.stringify({
         name: room_name,
         host_id: props.player.id,
-        game_type: 'SCIBBLE'
+        game_type: 'SCRIBBLE'
       })
     }).then(res => res.json())
     .then(res => console.log(res))
 
-    history.push(`/${gameType.toLowerCase()}/${room_name}`);
+    setTimeout(() => {
+      history.push(`/${gameType.toLowerCase()}/${room_name}`);
+    }, 1000)
   }
 
   const createUnoGame = (room_name) => {

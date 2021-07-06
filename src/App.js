@@ -136,7 +136,11 @@ class App extends React.Component {
           />
         </Route>
         <Route path="/scribble/:name">
-          <ScibbleGame />
+          <ScibbleGame
+          player={this.state.player}
+          winPhrase={this.state.winPhrase}
+          gameName={this.state.gameName}
+          />
         </Route>
       </Switch>
     );

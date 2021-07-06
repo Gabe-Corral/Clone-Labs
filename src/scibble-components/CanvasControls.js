@@ -103,7 +103,7 @@ const CanvasControls = (props) => {
       width="30"
       height="30"
       id="brown-img"
-      onClick={() => props.onColorChange('brown')}
+      onClick={() => props.onColorChange('#8B4513')}
       />
       <input
       type="image"
@@ -141,6 +141,7 @@ const CanvasControls = (props) => {
       id="blue-img"
       onClick={() => props.onColorChange('blue')}
       />
+      <h2>_ _ _ b _ _</h2>
     </div>
   )
 }

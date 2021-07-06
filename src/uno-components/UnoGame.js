@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from "react-router-dom";
-import JoinList from './JoinList';
+import JoinList from '../components/JoinList';
 import PlayerCard from './PlayerCard';
 import CurrentPlayer from './CurrentPlayer';
 import ActiveCard from './ActiveCard';

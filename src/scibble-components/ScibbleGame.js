@@ -1,5 +1,12 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import CanvasControls from './CanvasControls';
+import MessageBox from './MessageBox';
+import JoinList from '../components/JoinList';
+import io from 'socket.io-client';
+import { useHistory } from "react-router-dom";
+
+const ENDPOINT = 'http://localhost:5000';
+let socket;
 
 const ScibbleGame = (props) => {
   const canvasRef = useRef(null);
@@ -9,13 +16,75 @@ const ScibbleGame = (props) => {
   const [undo, setUndo] = useState(0);
   const [redo, setRedo] = useState(0);
   const [currentColor, setCurrentColor] = useState('black');
+  const [currenLineWidth, setCurrentLineWidth] = useState(5);
   const [isDrawing, setIsDrawing] = useState(false);
 
+  const history = useHistory();
+  const gameName = props.gameName;
+  const [gameStart, setGameStart] = useState(false);
+  const [players, setPlayers] = useState([]);
+  const [playerTurn, setPlayerTurn] = useState('');
+  const [game, setGame] = useState('');
+  const [gameOver, setGameOver] = useState(false);
+
+  const getGame = useCallback(() => {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/game_name/${gameName}/`)
+      .then(res => res.json())
+      .then(res => {
+        setGame(res);
+        if (props.player.id === res.host_id) {
+          console.log("get words");
+        }
+      }).catch(error => {
+        history.push("/")
+      })
+  }, [gameName, props.player.id, history])
+
+  const onConnect = useCallback(() => {
+    const connectionOptions =  {
+      "forceNew" : true,
+      "reconnectionAttempts": "Infinity",
+      "timeout" : 10000,
+      "transports" : ["websocket"]
+      }
+
+    socket = io.connect(ENDPOINT, connectionOptions);
+    let data = {
+      room: gameName,
+      player: props.player.nickname,
+      winPhrase: props.winPhrase
+    }
+
+    socket.emit('join', data, (error) => {
+      if (error) console.log("error: ", error);
+    })
+  }, [props.player.nickname, props.winPhrase, gameName])
+
   useEffect(() => {
+    getGame();
+    onConnect();
+  }, [onConnect, getGame])
+
+  useEffect(() => {
+
+    socket.on('initGameState', ({gameOver, playerTurn, gameStart}) => {
+      setGameOver(gameOver);
+      setPlayerTurn(playerTurn);
+      setGameStart(gameStart);
+      createCanvas();
+    })
+
+    socket.on("roomData", ({ users }) => {
+      setPlayers(users);
+    })
+
+  }, [])
+
+  const createCanvas = () => {
     const canvas = canvasRef.current;
-    canvas.width = window.innerWidth * 2 -800;
+    canvas.width = window.innerWidth * 2;
     canvas.height = window.innerHeight * 2 -800;
-    canvas.style.width = `${window.innerWidth-400}px`;
+    canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight-400}px`;
 
     const context = canvas.getContext("2d");
@@ -24,7 +93,7 @@ const ScibbleGame = (props) => {
     context.strokeStyle = "black";
     context.lineWidth = 5;
     contextRef.current = context;
-  }, [])
+  }
 
   const startDrawing = ({nativeEvent}) => {
     const {offsetX, offsetY} = nativeEvent;
@@ -34,7 +103,7 @@ const ScibbleGame = (props) => {
       ...undoSteps,
       [undo + 1]: []
     };
-    temp[undo + 1].push({ offsetX, offsetY });
+    temp[undo + 1].push({ offsetX, offsetY, currenLineWidth, currentColor });
     setUndoSteps(temp);
     setUndo(undo + 1);
     setIsDrawing(true);
@@ -55,17 +124,16 @@ const ScibbleGame = (props) => {
     const temp = {
       ...undoSteps
     };
-    temp[undo].push({ offsetX, offsetY });
+    temp[undo].push({ offsetX, offsetY, currenLineWidth, currentColor });
     setUndoSteps(temp);
   }
 
   const undoLastOperation = () => {
-    console.log(undo)
     if (undo > 0) {
       const data = undoSteps[undo];
       contextRef.current.strokeStyle = "#DCDCDC";
       contextRef.current.beginPath();
-      contextRef.current.lineWidth = 5;
+      contextRef.current.lineWidth = data[0].currenLineWidth+1;
       contextRef.current.moveTo(data[0].offsetX, data[0].offsetY);
       data.forEach((item, index) => {
         if (index !== 0) {
@@ -93,9 +161,9 @@ const ScibbleGame = (props) => {
   const redoLastOperation = () => {
     if (redo > 0) {
       const data = redoStep[redo];
-      contextRef.current.strokeStyle = "black";
+      contextRef.current.strokeStyle = data[0].currentColor;
       contextRef.current.beginPath();
-      contextRef.current.lineWidth = 5;
+      contextRef.current.lineWidth = data[0].currenLineWidth;
       contextRef.current.moveTo(data[0].offsetX, data[0].offsetY);
       data.forEach((item, index) => {
         if (index !== 0) {
@@ -136,6 +204,7 @@ const ScibbleGame = (props) => {
     const context = canvasRef.current.getContext("2d");
     context.lineWidth = size;
     contextRef.current = context;
+    setCurrentLineWidth(size);
   }
 
   const onColorChange = (color) => {
@@ -145,22 +214,48 @@ const ScibbleGame = (props) => {
     setCurrentColor(color);
   }
 
+  const onGameStart = (e) => {
+    e.preventDefault();
+    setGameStart(true);
+
+    socket.emit('initGameState', {
+      gameOver: false,
+      playerTurn: props.player.nickname,
+      gameStart: true,
+    })
+  }
+
   return (
     <div className="canvas-container">
-      <canvas className="draw-canvas"
-        onMouseDown={startDrawing}
-        onMouseUp={stopDrawing}
-        onMouseMove={draw}
-        ref={canvasRef}
-      />
-      <CanvasControls
-      onDraw={onDraw}
-      onErase={onErase}
-      onChangeSize={onChangeSize}
-      onColorChange={onColorChange}
-      undoLastOperation={undoLastOperation}
-      redoLastOperation={redoLastOperation}
-      />
+      {gameStart ? (
+        <div>
+          <canvas className="draw-canvas"
+            onMouseDown={startDrawing}
+            onMouseUp={stopDrawing}
+            onMouseMove={draw}
+            ref={canvasRef}
+          />
+          <CanvasControls
+            onDraw={onDraw}
+            onErase={onErase}
+            onChangeSize={onChangeSize}
+            onColorChange={onColorChange}
+            undoLastOperation={undoLastOperation}
+            redoLastOperation={redoLastOperation}
+          />
+          <MessageBox
+            players={players}
+            playerTurn={playerTurn}
+          />
+          </div>
+      ) : (
+        <JoinList
+        players={players}
+        game={game}
+        current_player={props.player}
+        onGameStart={onGameStart}
+        />
+      )}
     </div>
   )
 }
