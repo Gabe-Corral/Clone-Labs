@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -35,28 +35,40 @@ const MessageBox = (props) => {
   let [messages, setMessages] = useState([]);
   const [word, setWord] = useState('');
 
-  const handleChange = (e) => {
-    e.preventDefault();
-    setWord(e.target.value);
-  }
-
-  const addMessage = (e) => {
-    e.preventDefault();
+  const addMessage = useCallback((user, text) => {
     let key = messages.length + 1
     let newMessages = messages.slice();
     newMessages.push(
       <ListItem key={key.toString()}>
           <Grid container>
               <Grid item={true} xs={12}>
-                  <ListItemText align="left" primary={word}></ListItemText>
+                  <ListItemText align="left" primary={text}></ListItemText>
               </Grid>
               <Grid item={true} xs={12}>
-                  <ListItemText align="left" secondary="Gabe"></ListItemText>
+                  <ListItemText align="left" secondary={user}></ListItemText>
               </Grid>
           </Grid>
       </ListItem>
     )
     setMessages(newMessages);
+  }, [messages])
+
+  useEffect(() => {
+    props.socket.on('message', ({user, text}) => {
+      addMessage(user, text);
+    })
+  }, [props.socket, addMessage])
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setWord(e.target.value);
+  }
+
+  const sendMessage = () => {
+    props.socket.emit('sendMessage', {
+      user: props.player,
+      message: word
+    })
     setWord('');
   }
 
@@ -78,7 +90,7 @@ const MessageBox = (props) => {
                        fullWidth />
                   </Grid>
                   <Grid item={true} xs={1} align="right">
-                      <Fab color="primary" aria-label="add" onClick={addMessage}><SendIcon /></Fab>
+                      <Fab color="primary" aria-label="add" onClick={sendMessage}><SendIcon /></Fab>
                   </Grid>
               </Grid>
           </Grid>

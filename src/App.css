@@ -8,6 +8,13 @@
   background-color: #51617d !important;
 } */
 
+/* .canvas-container {
+  background-image: url('./images/bgB.png');
+  background-size: cover;
+  margin: 0;
+  height: 100vh;
+} */
+
 .blue {
   background-image: url('./images/bgB.png');
   background-size: cover;

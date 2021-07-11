@@ -67,6 +67,11 @@ const ScibbleGame = (props) => {
 
   useEffect(() => {
 
+    socket.on('updateGameState', ({ gameOver, playerTurn }) => {
+      setGameOver(gameOver);
+      setPlayerTurn(playerTurn);
+    })
+
     socket.on('initGameState', ({gameOver, playerTurn, gameStart}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
@@ -214,6 +219,13 @@ const ScibbleGame = (props) => {
     setCurrentColor(color);
   }
 
+  const onGameUpdate = () => {
+    socket.emit('updateGameState', {
+      gameOver: false,
+      playerTurn: playerTurn
+    })
+  }
+
   const onGameStart = (e) => {
     e.preventDefault();
     setGameStart(true);
@@ -245,7 +257,9 @@ const ScibbleGame = (props) => {
           />
           <MessageBox
             players={players}
+            player={props.player.nickname}
             playerTurn={playerTurn}
+            socket={socket}
           />
           </div>
       ) : (
