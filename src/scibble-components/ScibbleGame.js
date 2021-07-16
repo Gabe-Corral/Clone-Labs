@@ -67,11 +67,6 @@ const ScibbleGame = (props) => {
 
   useEffect(() => {
 
-    socket.on('updateGameState', ({ gameOver, playerTurn }) => {
-      setGameOver(gameOver);
-      setPlayerTurn(playerTurn);
-    })
-
     socket.on('initGameState', ({gameOver, playerTurn, gameStart}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
@@ -79,11 +74,34 @@ const ScibbleGame = (props) => {
       createCanvas();
     })
 
+    socket.on('updateCanvas', ({ start, color, offsetX, offsetY, playerTurn, lineWidth, callUndo, callRedo, undoSteps, undo}) => {
+      if (playerTurn !== props.player.nickname) {
+        setCurrentColor(color);
+        setCurrentLineWidth(lineWidth);
+        setUndoSteps(undoSteps);
+        setUndo(undo)
+        const context = canvasRef.current.getContext("2d");
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+        contextRef.current = context;
+
+        if (callUndo) {
+          undoLastOperation();
+        } else if (callRedo) {
+          redoLastOperation();
+        } else if (start) {
+          startDrawingView(offsetX, offsetY)
+        } else {
+          drawView(offsetX, offsetY);
+        }
+      }
+    })
+
     socket.on("roomData", ({ users }) => {
       setPlayers(users);
     })
 
-  }, [])
+  }, [props.player.nickname])
 
   const createCanvas = () => {
     const canvas = canvasRef.current;
@@ -100,6 +118,16 @@ const ScibbleGame = (props) => {
     contextRef.current = context;
   }
 
+  const drawView = (offsetX, offsetY) => {
+    contextRef.current.lineTo(offsetX, offsetY);
+    contextRef.current.stroke();
+  }
+
+  const startDrawingView = (offsetX, offsetY) => {
+    contextRef.current.beginPath();
+    contextRef.current.moveTo(offsetX, offsetY);
+  }
+
   const startDrawing = ({nativeEvent}) => {
     const {offsetX, offsetY} = nativeEvent;
     contextRef.current.beginPath();
@@ -112,6 +140,21 @@ const ScibbleGame = (props) => {
     setUndoSteps(temp);
     setUndo(undo + 1);
     setIsDrawing(true);
+
+    if (playerTurn === props.player.nickname) {
+      socket.emit('updateCanvas', {
+        start: true,
+        color: currentColor,
+        offsetX: offsetX,
+        offsetY: offsetY,
+        playerTurn: playerTurn,
+        lineWidth: canvasRef.current.getContext("2d").lineWidth,
+        callUndo: false,
+        callRedo: false,
+        undoSteps: undoSteps,
+        undo: undo
+      })
+    }
   }
 
   const stopDrawing = () => {
@@ -131,6 +174,21 @@ const ScibbleGame = (props) => {
     };
     temp[undo].push({ offsetX, offsetY, currenLineWidth, currentColor });
     setUndoSteps(temp);
+
+    if (playerTurn === props.player.nickname) {
+      socket.emit('updateCanvas', {
+        start: false,
+        color: currentColor,
+        offsetX: offsetX,
+        offsetY: offsetY,
+        playerTurn: playerTurn,
+        lineWidth: canvasRef.current.getContext("2d").lineWidth,
+        callUndo: false,
+        callRedo: false,
+        undoSteps: undoSteps,
+        undo: undo
+      })
+    }
   }
 
   const undoLastOperation = () => {
@@ -156,6 +214,22 @@ const ScibbleGame = (props) => {
         ...redoStep,
         [redo + 1]: [...data]
       };
+
+      if (playerTurn === props.player.nickname) {
+        socket.emit('updateCanvas', {
+          start: false,
+          color: currentColor,
+          offsetX: null,
+          offsetY: null,
+          playerTurn: playerTurn,
+          lineWidth: canvasRef.current.getContext("2d").lineWidth,
+          callUndo: true,
+          callRedo: false,
+          undoSteps: undoSteps,
+          undo: undo
+        })
+      }
+
       setUndo(undo - 1);
       setRedo(redo + 1);
       setRedoStep(te);
@@ -181,6 +255,22 @@ const ScibbleGame = (props) => {
         ...redoStep,
         [redo]: []
       };
+
+      if (playerTurn === props.player.nickname) {
+        socket.emit('updateCanvas', {
+          start: false,
+          color: currentColor,
+          offsetX: null,
+          offsetY: null,
+          playerTurn: playerTurn,
+          lineWidth: canvasRef.current.getContext("2d").lineWidth,
+          callUndo: false,
+          callRedo: false,
+          undoSteps: undoSteps,
+          undo: undo
+        })
+      }
+
       setUndo(undo + 1);
       setRedo(redo - 1);
       setRedoStep(temp);
@@ -219,10 +309,12 @@ const ScibbleGame = (props) => {
     setCurrentColor(color);
   }
 
-  const onGameUpdate = () => {
+  const onGameUpdate = (startDrawing=false, draw=false, stopDrawing=false, nativeEvent=null) => {
     socket.emit('updateGameState', {
-      gameOver: false,
-      playerTurn: playerTurn
+      startDrawing: startDrawing,
+      draw: draw,
+      stopDrawing: stopDrawing,
+      nativeEvent: nativeEvent
     })
   }
 
@@ -233,7 +325,7 @@ const ScibbleGame = (props) => {
     socket.emit('initGameState', {
       gameOver: false,
       playerTurn: props.player.nickname,
-      gameStart: true,
+      gameStart: true
     })
   }
 

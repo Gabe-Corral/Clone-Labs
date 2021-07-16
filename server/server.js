@@ -58,6 +58,13 @@ io.on('connection', socket => {
             io.to(user.room).emit('roomData', {room: user.room, users: getUsersInRoom(user.room)})
     })
 
+    socket.on('updateCanvas', canvasState => {
+      const user = getUser(socket.id);
+      if (user) {
+        io.to(user.room).emit('updateCanvas', canvasState)
+      }
+    })
+
   })
 })
 
