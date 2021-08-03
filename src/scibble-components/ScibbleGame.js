@@ -9,23 +9,36 @@ const ENDPOINT = 'http://localhost:5000';
 let socket;
 
 const ScibbleGame = (props) => {
+  const history = useHistory();
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
+
   const [undoSteps, setUndoSteps] = useState({});
   const [redoStep, setRedoStep] = useState({});
   const [undo, setUndo] = useState(0);
   const [redo, setRedo] = useState(0);
+
   const [currentColor, setCurrentColor] = useState('black');
   const [currenLineWidth, setCurrentLineWidth] = useState(5);
   const [isDrawing, setIsDrawing] = useState(false);
 
-  const history = useHistory();
   const gameName = props.gameName;
   const [gameStart, setGameStart] = useState(false);
   const [players, setPlayers] = useState([]);
   const [playerTurn, setPlayerTurn] = useState('');
   const [game, setGame] = useState('');
   const [gameOver, setGameOver] = useState(false);
+  const [wordList, setWordList] = useState([]);
+  const [currentWord, setCurrentWord] = useState('');
+
+  const getWords = useCallback(() => {
+    fetch(`${process.env.REACT_APP_.BASE_URL}/words/`)
+    .then(res => res.json())
+    .then(res => {
+      setWordList(res)
+      setCurrentWord(res[Math.floor(Math.random()*res.length)]);
+    })
+  }, [])
 
   const getGame = useCallback(() => {
     fetch(`${process.env.REACT_APP_.BASE_URL}/game_name/${gameName}/`)
@@ -33,12 +46,12 @@ const ScibbleGame = (props) => {
       .then(res => {
         setGame(res);
         if (props.player.id === res.host_id) {
-          console.log("get words");
+          getWords();
         }
       }).catch(error => {
         history.push("/")
       })
-  }, [gameName, props.player.id, history])
+  }, [gameName, props.player.id, history, getWords])
 
   const onConnect = useCallback(() => {
     const connectionOptions =  {
@@ -67,19 +80,26 @@ const ScibbleGame = (props) => {
 
   useEffect(() => {
 
-    socket.on('initGameState', ({gameOver, playerTurn, gameStart}) => {
+    socket.on('initGameState', ({gameOver, playerTurn, gameStart, currentWord, wordList}) => {
       setGameOver(gameOver);
       setPlayerTurn(playerTurn);
       setGameStart(gameStart);
       createCanvas();
+      setWordList(wordList);
+      setCurrentWord(currentWord);
+      console.log(currentWord.name)
     })
 
-    socket.on('updateCanvas', ({ start, color, offsetX, offsetY, playerTurn, lineWidth, callUndo, callRedo, undoSteps, undo}) => {
+    socket.on('updateCanvas', ({
+                                start, color, offsetX, offsetY,
+                                playerTurn, lineWidth, callUndo,
+                                callRedo
+                              }) => {
+
       if (playerTurn !== props.player.nickname) {
         setCurrentColor(color);
         setCurrentLineWidth(lineWidth);
-        setUndoSteps(undoSteps);
-        setUndo(undo)
+
         const context = canvasRef.current.getContext("2d");
         context.strokeStyle = color;
         context.lineWidth = lineWidth;
@@ -101,7 +121,7 @@ const ScibbleGame = (props) => {
       setPlayers(users);
     })
 
-  }, [props.player.nickname])
+  }, [props.player.nickname, currentColor])
 
   const createCanvas = () => {
     const canvas = canvasRef.current;
@@ -118,17 +138,27 @@ const ScibbleGame = (props) => {
     contextRef.current = context;
   }
 
+  const startDrawingView = (offsetX, offsetY) => {
+    contextRef.current.beginPath();
+    contextRef.current.moveTo(offsetX, offsetY);
+    const temp = {
+      ...undoSteps,
+      [undo + 1]: []
+    };
+    temp[undo + 1].push({ offsetX, offsetY, currenLineWidth, currentColor });
+    setUndoSteps(temp);
+    setUndo(undo + 1);
+  }
+
   const drawView = (offsetX, offsetY) => {
     contextRef.current.lineTo(offsetX, offsetY);
     contextRef.current.stroke();
   }
 
-  const startDrawingView = (offsetX, offsetY) => {
-    contextRef.current.beginPath();
-    contextRef.current.moveTo(offsetX, offsetY);
-  }
-
   const startDrawing = ({nativeEvent}) => {
+    if (props.player.nickname !== playerTurn) {
+      return;
+    }
     const {offsetX, offsetY} = nativeEvent;
     contextRef.current.beginPath();
     contextRef.current.moveTo(offsetX, offsetY);
@@ -150,14 +180,15 @@ const ScibbleGame = (props) => {
         playerTurn: playerTurn,
         lineWidth: canvasRef.current.getContext("2d").lineWidth,
         callUndo: false,
-        callRedo: false,
-        undoSteps: undoSteps,
-        undo: undo
+        callRedo: false
       })
     }
   }
 
   const stopDrawing = () => {
+    if (props.player.nickname !== playerTurn) {
+      return;
+    }
     contextRef.current.closePath();
     setIsDrawing(false);
   }
@@ -184,9 +215,7 @@ const ScibbleGame = (props) => {
         playerTurn: playerTurn,
         lineWidth: canvasRef.current.getContext("2d").lineWidth,
         callUndo: false,
-        callRedo: false,
-        undoSteps: undoSteps,
-        undo: undo
+        callRedo: false
       })
     }
   }
@@ -214,22 +243,6 @@ const ScibbleGame = (props) => {
         ...redoStep,
         [redo + 1]: [...data]
       };
-
-      if (playerTurn === props.player.nickname) {
-        socket.emit('updateCanvas', {
-          start: false,
-          color: currentColor,
-          offsetX: null,
-          offsetY: null,
-          playerTurn: playerTurn,
-          lineWidth: canvasRef.current.getContext("2d").lineWidth,
-          callUndo: true,
-          callRedo: false,
-          undoSteps: undoSteps,
-          undo: undo
-        })
-      }
-
       setUndo(undo - 1);
       setRedo(redo + 1);
       setRedoStep(te);
@@ -255,22 +268,6 @@ const ScibbleGame = (props) => {
         ...redoStep,
         [redo]: []
       };
-
-      if (playerTurn === props.player.nickname) {
-        socket.emit('updateCanvas', {
-          start: false,
-          color: currentColor,
-          offsetX: null,
-          offsetY: null,
-          playerTurn: playerTurn,
-          lineWidth: canvasRef.current.getContext("2d").lineWidth,
-          callUndo: false,
-          callRedo: false,
-          undoSteps: undoSteps,
-          undo: undo
-        })
-      }
-
       setUndo(undo + 1);
       setRedo(redo - 1);
       setRedoStep(temp);
@@ -325,7 +322,9 @@ const ScibbleGame = (props) => {
     socket.emit('initGameState', {
       gameOver: false,
       playerTurn: props.player.nickname,
-      gameStart: true
+      gameStart: true,
+      currentWord: currentWord,
+      wordList: wordList
     })
   }
 
@@ -346,12 +345,14 @@ const ScibbleGame = (props) => {
             onColorChange={onColorChange}
             undoLastOperation={undoLastOperation}
             redoLastOperation={redoLastOperation}
+            currentWord={currentWord}
           />
           <MessageBox
             players={players}
             player={props.player.nickname}
             playerTurn={playerTurn}
             socket={socket}
+            currentWord={currentWord}
           />
           </div>
       ) : (

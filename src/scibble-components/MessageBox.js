@@ -65,9 +65,15 @@ const MessageBox = (props) => {
   }
 
   const sendMessage = () => {
+    let text = word;
+
+    if (word === props.currentWord.name) {
+      text = `${props.player} guessed the word.`;
+    }
+
     props.socket.emit('sendMessage', {
       user: props.player,
-      message: word
+      message: text
     })
     setWord('');
   }

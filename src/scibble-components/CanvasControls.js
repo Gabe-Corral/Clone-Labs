@@ -13,6 +13,20 @@ import Redo from './assets/redo.png';
 
 const CanvasControls = (props) => {
 
+  const displayCurrentWord = (hint_indexs=[1]) => {
+    if (props.currentWord !== "") {
+      let displayedWord = [];
+      for (let i = 0; i < props.currentWord.name.length; i++) {
+          if (hint_indexs.includes(i)) {
+            displayedWord.push(props.currentWord.name[i]);
+          } else {
+            displayedWord.push("_");
+          }
+      }
+      return displayedWord.join(" ");
+    }
+  }
+
   return (
     <div className="cavnas-controls">
       <input
@@ -141,7 +155,7 @@ const CanvasControls = (props) => {
       id="blue-img"
       onClick={() => props.onColorChange('blue')}
       />
-      <h2>_ _ _ b _ _</h2>
+      <h2>{displayCurrentWord()}</h2>
     </div>
   )
 }
