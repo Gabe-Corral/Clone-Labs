@@ -1,8 +1,8 @@
 import React from 'react';
 
 const ActiveCard = (props) => {
-  let img = process.env.PUBLIC_URL + `/deck_assets/${props.card}.png`;
-  let imgBack = process.env.PUBLIC_URL + "/deck_assets/card-back.png";
+  let img = `/static/deck_assets/${props.card}.png`;
+  let imgBack = "/static/deck_assets/card-back.png";
 
   return (
     <div className="active_card_container">

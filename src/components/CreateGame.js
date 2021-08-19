@@ -70,6 +70,7 @@ const CreateGame = (props) => {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'X-CSRFToken': props.getToken('csrftoken')
       },
       method: 'POST',
       body: JSON.stringify({
@@ -90,6 +91,7 @@ const CreateGame = (props) => {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'X-CSRFToken': props.getToken('csrftoken')
       },
       method: 'POST',
       body: JSON.stringify({
@@ -100,7 +102,9 @@ const CreateGame = (props) => {
     }).then(res => res.json())
     .then(res => console.log(res))
 
-    history.push(`/${gameType.toLowerCase()}/${room_name}`);
+    setTimeout(() => {
+      history.push(`/${gameType.toLowerCase()}/${room_name}`);
+    }, 1000)
   }
 
   return (

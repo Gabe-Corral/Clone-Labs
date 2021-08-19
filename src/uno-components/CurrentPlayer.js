@@ -1,6 +1,6 @@
 import React from 'react';
 import Fade from 'react-reveal/Fade';
-
+///static/deck_assets/
 const CurrentPlayer = (props) => {
   let elements = [];
 
@@ -48,7 +48,7 @@ const CurrentPlayer = (props) => {
 
   let id = 0;
   for (let i in props.hand) {
-    let img = process.env.PUBLIC_URL+`/deck_assets/${props.hand[i].name}.png`;
+    let img = `/static/deck_assets/${props.hand[i].name}.png`;
     let name = props.hand[i].name;
     id += 1
 

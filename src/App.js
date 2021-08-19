@@ -126,6 +126,7 @@ class App extends React.Component {
           player={this.state.player}
           setWinPhrase={this.setWinPhrase}
           setGameName={this.setGameName}
+          getToken={this.getToken}
           />
         </Route>
         <Route path="/uno/:name">
