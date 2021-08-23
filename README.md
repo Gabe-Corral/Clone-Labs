@@ -46,6 +46,7 @@ node server.js
 
 ## Things To Do
 
+- Redesign winner component
 - Bug fixes/improve code quality
 - Add a profile page
 - Clean up/improve the UI
