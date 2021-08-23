@@ -1,28 +1,30 @@
-<h1 align="center">UNO</h1>
-<h2 align="center">Online Multiplayer UNO Game</h2>
+<h1 align="center">Ripped Games</h1>
+<h2 align="center">A Collection of Multiplayer Mini Games</h2>
 
 ## About
 
-This is a multiplayer UNO game. The game was built using React, Nodejs, SocketIO, Express, and Django.
-
-## Game Rules
-
-You can find the rules [here](https://www.unorules.com/).
+Ripped Games is a collection of multiplayer mini games. The name comes from the fact that none of the games are original and are mostly rip offs of more well known games. The design is similar to Kahoot/Jackbox and was heavily inspired by Kahoot/Jackbox.
 
 ## Gameplay
 
-Once logged in you will be able to create a room or join a room. This design was inspired by Jackbox and Kahoot. As of right now, the game ends when one player wins, but I will change this in the near future.
+Once logged in you will be able to create a room or join a room. As of right now there are only two games to choose from, but I plan on adding more games in the near future.
 
-## Plans For the Project
+## Games To Be Added
 
-As of right now, this is purely an UNO game, but I plan on adding more Kahoot/Jackbox styled games to this project.
+- A Verse City clone. You can find the original game [here](https://www.jackboxgames.com/mad-verse-city/).
+- Texas Hold 'em
+- Black Jack
+
+## Games In Progress
+
+- A Skribbl clone. You can find the original game [here](https://skribbl.io/) (almost finished).
 
 ## Setup
 
 
 ```
-git clone https://github.com/Gabe-Corral/Uno.git
-cd Uno
+git clone https://github.com/Gabe-Corral/ripped-games.git
+cd ripped-games
 pip install -r requirements.txt
 npm install
 npm run build
@@ -32,7 +34,7 @@ python manage.py runserver
 You will also need to run the game server. Open a new terminal and run these commands.
 
 ```
-cd Uno/server
+cd ripped-games/server
 node server.js
 ```
 
