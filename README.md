@@ -22,7 +22,7 @@ As of right now, this is purely an UNO game, but I plan on adding more Kahoot/Ja
 
 ```
 git clone https://github.com/Gabe-Corral/Uno.git
-cd uno-font-end
+cd Uno
 pip install -r requirements.txt
 npm install
 npm run build
