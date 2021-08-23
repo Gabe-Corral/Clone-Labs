@@ -46,6 +46,8 @@ node server.js
 
 <img src="screenshots/uno-homepage.png" alt="Screenshot 1" width="75%" align="center" />
 
+<img src="screenshots/scribble.png" alt="Screenshot 1" width="75%" align="center" />
+
 ## Things To Do
 
 - Redesign winner component
