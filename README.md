@@ -1,9 +1,9 @@
-<h1 align="center">Ripped Games</h1>
+<h1 align="center">Clone Labs</h1>
 <h2 align="center">A Collection of Multiplayer Mini Games</h2>
 
 ## About
 
-Ripped Games is a collection of multiplayer mini games. The name comes from the fact that none of the games are original and are mostly rip offs of more well known games. The design is similar to Kahoot/Jackbox and was heavily inspired by Kahoot/Jackbox.
+Clone Labs is a collection of multiplayer mini games. The name comes from the fact that none of the games are original and are mostly rip offs of more well known games. The design is similar to Kahoot/Jackbox and was heavily inspired by Kahoot/Jackbox.
 
 ## Gameplay
 
