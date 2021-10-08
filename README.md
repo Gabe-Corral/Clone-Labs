@@ -23,8 +23,8 @@ Once logged in you will be able to create a room or join a room. As of right now
 
 
 ```
-git clone https://github.com/Gabe-Corral/ripped-games.git
-cd ripped-games
+git clone https://github.com/Gabe-Corral/Clone-Labs.git
+cd Clone-Labs
 pip install -r requirements.txt
 npm install
 npm run build
@@ -34,7 +34,7 @@ python manage.py runserver
 You will also need to run the game server. Open a new terminal and run these commands.
 
 ```
-cd ripped-games/server
+cd Clone-Labs/server
 node server.js
 ```
 
