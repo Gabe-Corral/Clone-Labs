@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from .models import Game, Player, Card, Word
+from .models import Game, Player, Card, Word, NormalCard
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,4 +19,9 @@ class CardSerializer(serializers.ModelSerializer):
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Word
+        fields = '__all__'
+
+class NormalCardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NormalCard
         fields = '__all__'
